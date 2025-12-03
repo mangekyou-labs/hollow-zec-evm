@@ -1,0 +1,48 @@
+{
+  "name": "app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "patch-package",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@1inch/byte-utils": "2.6.0",
+    "@1inch/cross-chain-sdk": "v0.1.15-rc.0",
+    "@bitcoinerlab/secp256k1": "^1.2.0",
+    "@rainbow-me/rainbowkit": "^2.2.8",
+    "@tanstack/react-query": "^5.83.0",
+    "axios": "^1.11.0",
+    "bip68": "^1.0.4",
+    "bitcoinjs-lib": "^6.1.7",
+    "copy-webpack-plugin": "^13.0.0",
+    "ecpair": "^3.0.0",
+    "next": "15.4.4",
+    "pino-pretty": "^13.0.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-icons": "^5.5.0",
+    "react-toastify": "^11.0.5",
+    "redis": "^5.6.1",
+    "viem": "^2.33.1",
+    "wagmi": "^2.16.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.4.4",
+    "patch-package": "^8.0.0",
+    "postinstall-postinstall": "^2.1.0",
+    "tailwind-scrollbar": "^4.0.2",
+    "tailwindcss": "^4",
+    "tsx": "^4.20.3",
+    "typescript": "^5"
+  }
+}

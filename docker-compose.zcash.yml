@@ -1,0 +1,26 @@
+services:
+  zcashd-testnet:
+    image: electriccoinco/zcashd:latest
+    container_name: zcashd-testnet
+    ports:
+      - "18232:18232"  # RPC port for testnet
+    volumes:
+      - zcash-testnet-data:/srv/zcashd/.zcash
+    entrypoint: ["/usr/bin/zcashd"]
+    command:
+      - "-testnet"
+      - "-rpcuser=zcashuser"
+      - "-rpcpassword=zcashpass"
+      - "-rpcport=18232"
+      - "-rpcallowip=0.0.0.0/0"
+      - "-rpcbind=0.0.0.0"
+      - "-server"
+      - "-daemon=0"
+      - "-i-am-aware-zcashd-will-be-replaced-by-zebrad-and-zallet-in-2025=1"
+      - "-allowdeprecated=getnewaddress,z_getnewaddress"
+    restart: unless-stopped
+    platform: linux/amd64  # Use amd64 for compatibility
+
+volumes:
+  zcash-testnet-data:
+

@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": false,
+    "outDir": "./dist",
+    "rootDir": "../",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  },
+  "paths": {
+    "@1inch/byte-utils": ["./node_modules/@1inch/byte-utils"],
+    "@1inch/cross-chain-sdk": ["./node_modules/@1inch/cross-chain-sdk"],
+    "@bitcoinerlab/secp256k1": ["./node_modules/@bitcoinerlab/secp256k1"],
+    "axios": ["./node_modules/axios"],
+    "bip68": ["./node_modules/bip68"],
+    "bitcoinjs-lib": ["./node_modules/bitcoinjs-lib"],
+    "ecpair": ["./node_modules/ecpair"],
+    "ethers": ["./node_modules/ethers"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

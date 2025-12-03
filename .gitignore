@@ -1,0 +1,14 @@
+# IDE
+.idea
+.vscode
+
+# macOS system file
+.DS_Store
+
+# EVM
+broadcast
+
+# Bitcoin
+data_bitcoin_regtest
+
+.env
