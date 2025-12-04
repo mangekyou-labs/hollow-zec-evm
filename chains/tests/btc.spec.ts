@@ -143,13 +143,16 @@ describe('btc', () => {
                 sha256: bitcoin.crypto.sha256(secret)
             }
 
+            const makingAmount = 10000n
+            const takingAmount = 9999n
+
             const order = Sdk.CrossChainOrder.new(
                 new Address(evm.escrowFactory),
                 {
                     salt: Sdk.randBigInt(1000n),
                     maker: new Address(await evmUser.getAddress()),
-                    makingAmount: 10000n,
-                    takingAmount: 9999n,
+                    makingAmount,
+                    takingAmount,
                     makerAsset: new Address(evm.weth),
                     takerAsset: new Address(nativeTokenAddress)
                 },
@@ -403,7 +406,7 @@ describe('btc', () => {
 
             console.log(`[${evmChainId}] ✅ ETH Withdrawal TXID: ${resolverWithdrawHash}`)
 
-            // Check ETH balances after withdrawal
+            // Check WETH balances after withdrawal
             const evmResultBalances = await evmGetBalances([
                 {token: evm.weth, user: evmUser, resolver: evmResolverContract}
             ])

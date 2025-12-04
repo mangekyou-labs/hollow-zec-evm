@@ -6,13 +6,13 @@ The Zcash testnet container is now running and the RPC interface is **functional
 
 ### Current Status
 
-- **Container**: `zcashd-testnet` (running)
+- **Container**: `zcashd-testnet` (running; you plan to stop it cleanly before leaving)
 - **RPC Endpoint**: `http://localhost:18232`
 - **RPC Credentials**: 
   - Username: `zcashuser`
   - Password: `zcashpass`
 - **Network**: Testnet
-- **Sync Status**: Syncing (currently at block 20, needs ~3.2M blocks)
+- **Sync Status**: ✅ **Fully synced** — `verificationprogress` at 99.99%, `initialblockdownload` complete
 
 ### Verified Working
 
@@ -58,29 +58,34 @@ docker exec zcashd-testnet zcash-cli -testnet \
 - `docker-compose.zcash.yml` changes accepted.
 
 #### In Progress
-- Node is still reindexing/syncing. **All wallet operations (address creation, UTXO queries)** will fail with `code -28` until sync completes.
-- Wallet backup flow (required for new account-based APIs) has **not** yet been run; plan to use `zcashd-wallet-tool backup` once sync finishes.
-- Unit/integration tests (`npm run test:zec`, E2E HTLC flows) are queued up and will run once RPC endpoints are stable and synced.
+- ⏳ Wallet backup verification: Backup file exists but interactive verification step needs to be completed. The tool requires re-entering words from the recovery phrase to confirm backup.
+- ⏳ Address creation: Blocked until wallet backup verification is completed.
+- ⏳ Unit/integration tests: Queued until addresses can be created.
 
 #### Next Steps for Full Testing
 
-1. **Wait for sync** (or use `-prune` for faster dev):
-   ```bash
-   # Monitor sync progress
-   watch -n 5 'docker exec zcashd-testnet zcash-cli -testnet -rpcuser=zcashuser -rpcpassword=zcashpass getblockchaininfo | grep verificationprogress'
-   ```
+1. ✅ **Sync completed** - Node is fully synced
 
-2. **Set up wallet** (if needed for address creation):
+2. **Complete wallet backup verification** (interactive):
    ```bash
-   # Backup wallet first
-   docker exec zcashd-testnet zcashd-wallet-tool backup
+   docker exec -it zcashd-testnet zcashd-wallet-tool -testnet -rpcuser=zcashuser -rpcpassword=zcashpass
+   ```
+   Follow the prompts:
+   - Press Enter to accept default export filename (or provide custom name)
+   - Write down the 24-word recovery phrase
+   - Press Enter when finished
+   - Re-enter the requested words from the phrase when prompted
+
+3. **Create addresses** (after verification completes):
+   ```bash
+   # Transparent address
+   docker exec zcashd-testnet zcash-cli -testnet -rpcuser=zcashuser -rpcpassword=zcashpass getnewaddress
    
-   # Then create accounts/addresses
-   docker exec zcashd-testnet zcash-cli -testnet \
-     -rpcuser=zcashuser -rpcpassword=zcashpass z_getnewaccount
+   # Shielded address (Sapling)
+   docker exec zcashd-testnet zcash-cli -testnet -rpcuser=zcashuser -rpcpassword=zcashpass z_getnewaddress sapling
    ```
 
-3. **Run ZEC tests**:
+4. **Run ZEC tests**:
    ```bash
    cd chains
    npm install --legacy-peer-deps
@@ -107,6 +112,14 @@ The container is configured in `docker-compose.zcash.yml` with:
 - Test from inside container: `docker exec zcashd-testnet zcash-cli -testnet -rpcuser=zcashuser -rpcpassword=zcashpass getblockchaininfo`
 
 **Address creation fails:**
-- Wallet needs backup first (see "Set up wallet" above)
-- Or use `-allowdeprecated=getnewaddress,z_getnewaddress` flag (add to command in docker-compose)
+- Wallet backup verification must be completed. Run:
+  ```bash
+  docker exec -it zcashd-testnet zcashd-wallet-tool -testnet -rpcuser=zcashuser -rpcpassword=zcashpass
+  ```
+  Then follow the interactive prompts:
+  1. Press Enter to accept default export filename
+  2. Write down the recovery phrase (24 words)
+  3. Press Enter when finished
+  4. Re-enter the requested words from the phrase when prompted
+- Once verification completes, addresses can be created with `getnewaddress` and `z_getnewaddress`
 

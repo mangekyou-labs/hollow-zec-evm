@@ -66,30 +66,7 @@ contract Resolver is Ownable {
         // _ARGS_HAS_TARGET = 1 << 251
         takerTraits = TakerTraits.wrap(TakerTraits.unwrap(takerTraits) | uint256(1 << 251));
         bytes memory argsMem = abi.encodePacked(computed, args);
-        try _LOP.fillOrderArgs(order, r, vs, amount, takerTraits, argsMem) returns (
-            uint256 makingAmount,
-            uint256 takingAmount,
-            bytes32 filledOrderHash
-        ) {
-            console.log("fillOrderArgs ok");
-            console.log("makingAmount", makingAmount);
-            console.log("takingAmount", takingAmount);
-            console.logBytes32(filledOrderHash);
-        } catch (bytes memory reason) {
-            if (reason.length == 0) {
-                console.log("fillOrderArgs reverted without data");
-            } else if (reason.length >= 4) {
-                bytes4 selector;
-                assembly {
-                    selector := mload(add(reason, 0x20))
-                }
-                console.log("fillOrderArgs revert selector: %x", uint32(selector));
-            }
-            console.logBytes(reason);
-            assembly {
-                revert(add(reason, 0x20), mload(reason))
-            }
-        }
+        _LOP.fillOrderArgs(order, r, vs, amount, takerTraits, argsMem);
     }
 
     /**

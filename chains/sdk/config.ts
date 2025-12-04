@@ -70,5 +70,16 @@ export const config: Record<number, ChainConfig> = {
         // For macOS M4, Docker is recommended over native zcashd
         rpc: process.env.ZCASH_TESTNET_RPC || 'http://localhost:18232',
         explorer: 'https://explorer.testnet.z.cash'
+    },
+    199998: {
+        type: 'zcash',
+        name: 'Zcash Regtest',
+        symbol: 'ZEC',
+        unit: 'zec',
+        // Local regtest node for integration testing
+        // Start with: docker-compose -f docker-compose.zcash-regtest.yml up
+        // Mine blocks: docker exec zcashd-regtest zcash-cli -regtest -rpcuser=zcashuser -rpcpassword=zcashpass -rpcport=18332 generate 101
+        rpc: process.env.ZCASH_REGTEST_RPC || 'http://localhost:18332',
+        explorer: 'http://localhost:18332'
     }
 }

@@ -1,18 +1,18 @@
 services:
-  zcashd-testnet:
+  zcashd-regtest:
     image: electriccoinco/zcashd:latest
-    container_name: zcashd-testnet
+    container_name: zcashd-regtest
     ports:
-      - "18232:18232"  # RPC port for testnet
+      - "18332:18332"  # RPC port for regtest (different from testnet)
     volumes:
-      - zcash-testnet-data:/srv/zcashd/.zcash
-      - zcash-testnet-data:/srv/zcashd/export
+      - zcash-regtest-data:/srv/zcashd/.zcash
+      - zcash-regtest-data:/srv/zcashd/export
     entrypoint: ["/usr/bin/zcashd"]
     command:
-      - "-testnet"
+      - "-regtest"
       - "-rpcuser=zcashuser"
       - "-rpcpassword=zcashpass"
-      - "-rpcport=18232"
+      - "-rpcport=18332"
       - "-rpcallowip=0.0.0.0/0"
       - "-rpcbind=0.0.0.0"
       - "-server"
@@ -21,9 +21,11 @@ services:
       - "-allowdeprecated=getnewaddress"
       - "-allowdeprecated=z_getnewaddress"
       - "-exportdir=/srv/zcashd/export"
+      - "-gen=1"
+      - "-genproclimit=1"
     restart: unless-stopped
-    platform: linux/amd64  # Use amd64 for compatibility
+    platform: linux/amd64
 
 volumes:
-  zcash-testnet-data:
+  zcash-regtest-data:
 

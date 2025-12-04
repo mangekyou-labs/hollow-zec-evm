@@ -9,7 +9,7 @@ This document captures the end-to-end context of the Zcash bring-up, so the next
 | Component | Status |
 | --- | --- |
 | `docker-compose.zcash.yml` | Uses `electriccoinco/zcashd:latest`, direct `zcashd` entrypoint, testnet mode, RPC exposed on `localhost:18232`. Includes deprecation acknowledgement and legacy RPC flags. |
-| Container `zcashd-testnet` | **Running**, RPC reachable. Currently syncing (≈410k / 3.1M blocks, ~23% `verificationprogress`). |
+| Container `zcashd-testnet` | **Running**, RPC reachable. ✅ **Fully synced** (verificationprogress: 99.99%, initialblockdownload: complete). |
 | RPC credentials | `rpcuser=zcashuser`, `rpcpassword=zcashpass`. |
 | `ZCASH_DOCKER_STATUS.md` | Contains full logs, troubleshooting steps, and quick commands. |
 
@@ -38,18 +38,21 @@ docker exec zcashd-testnet zcash-cli -testnet \
 ## 3. Remaining Work (ordered)
 
 ### 3.1 Finish Node Sync & Wallet Prep
-1. Monitor sync until `initial_block_download_complete` becomes `true`.
-   - `watch -n 10 'docker exec zcashd-testnet zcash-cli ... getblockchaininfo | grep verificationprogress'`
-2. Run wallet backup (required for account-based APIs):
+1. ✅ **COMPLETED**: Node sync finished (verificationprogress: 99.99%)
+2. ⏳ **IN PROGRESS**: Wallet backup verification
+   - Backup file created: `/srv/zcashd/export/export20251204`
+   - Deprecated methods enabled: `-allowdeprecated=getnewaddress` and `-allowdeprecated=z_getnewaddress`
+   - Export directory configured: `-exportdir=/srv/zcashd/export`
+   - **BLOCKER**: Interactive verification step requires manual completion:
+     ```bash
+     docker exec -it zcashd-testnet zcashd-wallet-tool -testnet -rpcuser=zcashuser -rpcpassword=zcashpass
+     ```
+     Follow prompts to re-enter words from recovery phrase.
+3. ⏳ **PENDING**: Create addresses (blocked until step 2 completes)
    ```bash
-   docker exec zcashd-testnet zcashd-wallet-tool backup
+   docker exec zcashd-testnet zcash-cli -testnet -rpcuser=zcashuser -rpcpassword=zcashpass getnewaddress
+   docker exec zcashd-testnet zcash-cli -testnet -rpcuser=zcashuser -rpcpassword=zcashpass z_getnewaddress sapling
    ```
-3. Create accounts/addresses via new APIs:
-   ```bash
-   docker exec zcashd-testnet zcash-cli ... z_getnewaccount
-   docker exec zcashd-testnet zcash-cli ... z_getaddressforaccount <acct> sapling
-   ```
-   *(Alternatively, re-enable legacy `getnewaddress/z_getnewaddress` for transparent/shielded test cases.)*
 
 ### 3.2 Integration Tests (Transparent ZEC)
 4. **EVM → ZEC flow**
@@ -80,8 +83,8 @@ docker exec zcashd-testnet zcash-cli -testnet \
 
 | ID | Task | Status |
 | --- | --- | --- |
-| T1 | Finish Zcash node sync (≈3.1M blocks) | ⏳ In Progress |
-| T2 | Wallet backup + address creation (`z_getnewaccount`) | ⏳ Blocked on T1 |
+| T1 | Finish Zcash node sync (≈3.1M blocks) | ✅ **COMPLETED** |
+| T2 | Wallet backup verification + address creation | ⏳ **IN PROGRESS** - Backup file created, verification needs manual completion |
 | T3 | Transparent integration tests (EVM↔ZEC HTLC) | ⏳ Pending |
 | T4 | Shielded z→t→HTLC→t→z flow | ⏳ Pending |
 | T5 | Deploy & run smoke tests | ⏳ Pending |
@@ -92,8 +95,10 @@ docker exec zcashd-testnet zcash-cli -testnet \
 
 ## 5. Helpful Files
 
-- `docker-compose.zcash.yml` – container definition.
-- `ZCASH_SETUP.md` – setup steps (Docker, Zebra, remote RPC).
+- `docker-compose.zcash.yml` – testnet container definition.
+- `docker-compose.zcash-regtest.yml` – **regtest container for local testing (recommended for integration tests)**.
+- `ZCASH_SETUP.md` – setup steps (Docker, Zebra, remote RPC, regtest).
+- `ZCASH_REGTEST_SETUP.md` – **regtest-specific guide for local integration testing**.
 - `ZCASH_DOCKER_STATUS.md` – sync logs, troubleshooting, quick commands.
 - `chains/tests/zec.spec.ts` – HTLC unit tests (passing).
 - `chain-abstraction-shade-agent/src/utils/zcash.ts` – RPC + shielded helpers.

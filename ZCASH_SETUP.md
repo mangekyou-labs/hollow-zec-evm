@@ -127,6 +127,8 @@ async getUtxosFromExplorer(address: string): Promise<ZecUtxo[]> {
 
 ## Testing with Docker
 
+### Option A: Testnet (Public Network)
+
 Once Docker container is running:
 
 1. **Run ZEC HTLC tests:**
@@ -151,6 +153,54 @@ Once Docker container is running:
      "ztest..." \
      '[{"address":"tm...","amount":0.1}]'
    ```
+
+### Option B: Regtest (Local Fork - Recommended for Integration Testing)
+
+For local integration testing without needing testnet funds, use regtest mode:
+
+1. **Start regtest container:**
+   ```bash
+   docker-compose -f docker-compose.zcash-regtest.yml up -d
+   ```
+
+2. **Wait for node to start (usually ~10-15 seconds):**
+   ```bash
+   docker exec zcashd-regtest zcash-cli -regtest -rpcuser=zcashuser -rpcpassword=zcashpass -rpcport=18332 getblockchaininfo
+   ```
+
+3. **Create addresses and mine blocks to get funds:**
+   ```bash
+   # Create transparent address
+   docker exec zcashd-regtest zcash-cli -regtest -rpcuser=zcashuser -rpcpassword=zcashpass -rpcport=18332 getnewaddress
+   
+   # Create shielded address
+   docker exec zcashd-regtest zcash-cli -regtest -rpcuser=zcashuser -rpcpassword=zcashpass -rpcport=18332 z_getnewaddress sapling
+   
+   # Mine 101 blocks to mature coinbase (gets ~12.5 ZEC per block)
+   docker exec zcashd-regtest zcash-cli -regtest -rpcuser=zcashuser -rpcpassword=zcashpass -rpcport=18332 generate 101
+   
+   # Check balance
+   docker exec zcashd-regtest zcash-cli -regtest -rpcuser=zcashuser -rpcpassword=zcashpass -rpcport=18332 getbalance
+   ```
+
+4. **Configure SDK to use regtest:**
+   ```bash
+   export ZCASH_REGTEST_RPC="http://localhost:18332"
+   ```
+   Or update `chains/sdk/config.ts` to use chainId `199998` for regtest.
+
+5. **Run integration tests:**
+   ```bash
+   cd chains
+   npm test -- zec.spec.ts
+   ```
+
+**Advantages of Regtest:**
+- Instant block generation (no waiting for network)
+- Full control over mining and block times
+- No need for testnet faucets
+- Isolated from public testnet
+- Perfect for CI/CD and automated testing
 
 ## Troubleshooting
 

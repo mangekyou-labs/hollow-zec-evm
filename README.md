@@ -64,6 +64,28 @@ We also support Etherlink and Monad, with bidirectional swaps with BTC successfu
 
 - On-chain Dutch Auction or Partial Fill is not feasible. It may require off-chain coordination or would break the current 1inch Fusion + Flow model.
 
+## Running the Zcash Integration Test
+
+Use the following steps to reproduce the `evm -> zec` HTLC flow end-to-end:
+
+1. **Start the regtest node**
+   ```bash
+   docker compose -f docker-compose.zcash-regtest.yml up -d
+   ```
+2. **Install dependencies** (one time)
+   ```bash
+   cd chains
+   pnpm install
+   ```
+3. **Run the Jest suite with an extended timeout**
+   ```bash
+   pnpm jest tests/zec-integration.spec.ts --runInBand --testTimeout=300000
+   ```
+
+   The script mines and funds the Zcash node automatically. You will see logs for each phase (order creation, resolver fill, HTLC funding, withdrawals). The test exits green when the workflow succeeds.
+
+> If you stop the regtest node, rerun step 1 before executing the suite again.
+
 ## Partner Integration
 
 ### 1inch Fusion + Extension and Building Full Application
