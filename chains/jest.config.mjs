@@ -14,6 +14,10 @@ export default {
         '^.+\\.(t|j)s$': ['@swc/jest']
     },
     extensionsToTreatAsEsm: ['.ts', '.tsx'],
+    moduleNameMapper: {
+        '^prool$': '<rootDir>/test-utils/prool-shim.ts',
+        '^prool/instances$': '<rootDir>/test-utils/prool-shim.ts'
+    },
     transformIgnorePatterns: [
         // "/node_modules/",
         // "\\.pnp\\.[^\\/]+$",

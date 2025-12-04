@@ -10,6 +10,8 @@ This document captures the end-to-end context of the Zcash bring-up, so the next
 | --- | --- |
 | `docker-compose.zcash.yml` | Uses `electriccoinco/zcashd:latest`, direct `zcashd` entrypoint, testnet mode, RPC exposed on `localhost:18232`. Includes deprecation acknowledgement and legacy RPC flags. |
 | Container `zcashd-testnet` | **Running**, RPC reachable. ✅ **Fully synced** (verificationprogress: 99.99%, initialblockdownload: complete). |
+| `docker-compose.zcash-regtest.yml` | Uses `electriccoinco/zcashd:latest` in `-regtest` mode, RPC exposed on `localhost:18332`, mining enabled for local integration tests. |
+| Container `zcashd-regtest` | **Running on demand** for Jest integration tests; auto-mines and self-funds HTLC flows. |
 | RPC credentials | `rpcuser=zcashuser`, `rpcpassword=zcashpass`. |
 | `ZCASH_DOCKER_STATUS.md` | Contains full logs, troubleshooting steps, and quick commands. |
 
@@ -39,16 +41,12 @@ docker exec zcashd-testnet zcash-cli -testnet \
 
 ### 3.1 Finish Node Sync & Wallet Prep
 1. ✅ **COMPLETED**: Node sync finished (verificationprogress: 99.99%)
-2. ⏳ **IN PROGRESS**: Wallet backup verification
+2. ✅ **COMPLETED**: Wallet backup verification
    - Backup file created: `/srv/zcashd/export/export20251204`
    - Deprecated methods enabled: `-allowdeprecated=getnewaddress` and `-allowdeprecated=z_getnewaddress`
    - Export directory configured: `-exportdir=/srv/zcashd/export`
-   - **BLOCKER**: Interactive verification step requires manual completion:
-     ```bash
-     docker exec -it zcashd-testnet zcashd-wallet-tool -testnet -rpcuser=zcashuser -rpcpassword=zcashpass
-     ```
-     Follow prompts to re-enter words from recovery phrase.
-3. ⏳ **PENDING**: Create addresses (blocked until step 2 completes)
+   - Interactive `zcashd-wallet-tool` flow completed and recovery phrase confirmed.
+3. ✅ **COMPLETED**: Address creation on testnet
    ```bash
    docker exec zcashd-testnet zcash-cli -testnet -rpcuser=zcashuser -rpcpassword=zcashpass getnewaddress
    docker exec zcashd-testnet zcash-cli -testnet -rpcuser=zcashuser -rpcpassword=zcashpass z_getnewaddress sapling
@@ -56,12 +54,15 @@ docker exec zcashd-testnet zcash-cli -testnet \
 
 ### 3.2 Integration Tests (Transparent ZEC)
 4. **EVM → ZEC flow**
-   - Use local UI or SDK to create an EVM order with destination `199999`.
-   - Ensure resolver funds ZEC HTLC via `zcashd` RPC (`sendrawtransaction`).
-   - Verify `/api/claim-zec` claims HTLC using preimage; order status transitions to `withdraw_completed`.
+   - ✅ **COMPLETED on regtest**: `chains/tests/zec-integration.spec.ts` now runs an end-to-end `evm -> zec` HTLC flow against `zcashd-regtest`:
+     - Creates and fills an EVM order with destination ZEC chain.
+     - Resolver deploys source escrow via LOP + EscrowFactory.
+     - Zcash HTLC script is built and funded on regtest; maker withdraws ZEC; resolver withdraws ETH from escrow.
+   - See `README.md` → “Running the Zcash Integration Test” for exact `docker compose` and `pnpm jest` commands.
 5. **ZEC → EVM flow**
-   - Fund ZEC HTLC on source (transparent) using `zcashd`.
-   - Ensure resolver creates EVM escrow and claims ZEC refund path if needed.
+   - ⏳ **PENDING**: Implement mirror integration test (`zec -> evm`) on regtest:
+     - Fund ZEC HTLC on source (transparent) using `zcashd-regtest`.
+     - Ensure resolver creates EVM escrow and supports refund path when needed.
 
 ### 3.3 Shielded Roundtrip
 6. Implement `z→t→HTLC→t→z` using `ZecRpc.zSendMany` + `waitForOperation`:
@@ -84,8 +85,8 @@ docker exec zcashd-testnet zcash-cli -testnet \
 | ID | Task | Status |
 | --- | --- | --- |
 | T1 | Finish Zcash node sync (≈3.1M blocks) | ✅ **COMPLETED** |
-| T2 | Wallet backup verification + address creation | ⏳ **IN PROGRESS** - Backup file created, verification needs manual completion |
-| T3 | Transparent integration tests (EVM↔ZEC HTLC) | ⏳ Pending |
+| T2 | Wallet backup verification + address creation | ✅ **COMPLETED** - Backup verified, addresses created on testnet |
+| T3 | Transparent integration tests (EVM↔ZEC HTLC) | ⏳ **PARTIAL** - `evm→zec` passing on regtest via Jest; `zec→evm` still pending |
 | T4 | Shielded z→t→HTLC→t→z flow | ⏳ Pending |
 | T5 | Deploy & run smoke tests | ⏳ Pending |
 

@@ -3,7 +3,7 @@ import {createServer, CreateServerReturnType} from 'prool'
 import {anvil} from 'prool/instances'
 import {Wallet as SignerWallet} from 'ethers'
 import assert from 'node:assert'
-import Sdk from '@1inch/cross-chain-sdk'
+import * as Sdk from '@1inch/cross-chain-sdk'
 import trueERC20Contract from '../../dist/contracts/evm/ERC20True.sol/ERC20True.json'
 import wethContract from '../../dist/contracts/evm/WETH9.sol/WETH9.json'
 import lopContract from '../../dist/contracts/evm/LimitOrderProtocol.sol/LimitOrderProtocol.json'
@@ -44,7 +44,7 @@ export async function getProvider(
     const address = node.address()
     assert(address)
 
-    const provider = new JsonRpcProvider(`http://[${address.address}]:${address.port}/1`, chainId, {
+    const provider = new JsonRpcProvider(`http://${address.address}:${address.port}`, chainId, {
         cacheTimeout: -1,
         staticNetwork: true
     })

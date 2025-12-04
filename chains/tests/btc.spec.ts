@@ -1,7 +1,7 @@
 import {execSync} from 'child_process'
 import {BITCOIN_CLI} from './test-utils/btc'
 import {expect, jest} from '@jest/globals'
-import Sdk from '@1inch/cross-chain-sdk'
+import * as Sdk from '@1inch/cross-chain-sdk'
 import * as bitcoin from 'bitcoinjs-lib'
 
 import {randomBytes} from 'crypto'

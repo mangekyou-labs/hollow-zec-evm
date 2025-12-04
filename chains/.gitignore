@@ -134,3 +134,5 @@ cache
 .idea
 
 .env
+
+lib/
