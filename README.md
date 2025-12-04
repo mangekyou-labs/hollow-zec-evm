@@ -1,24 +1,6 @@
 # Hollow
 
-Hollow is a cross-chain swap app built on 1inch Fusion+, enabling seamless swaps across Bitcoin, Zcash (transparent HTLCs), Monad, and Etherlink. It also integrates NEAR chain signatures via the Shade Agent Framework to execute 1inch cross-chain orders in a fully chain-abstracted manner.
-
-## Description
-
-Fusion Unleashed. Chains Abstracted.
-
-Hollow is driven by two core visions:
-
-1. A Unified Atomic Swap Interface via 1inch Fusion+ Extension
-
-Hollow extends the 1inch Fusion+ protocol to support a broader set of blockchains. For this hackathon, we successfully integrated Bitcoin, Zcash (via transparent HTLCs), Monad, and Etherlink, enabling seamless bidirectional cross-chain swaps between BTC/ZEC and EVM-compatible chains like Monad and Etherlink. This proves that Fusion+ can serve as a universal layer for trustless atomic swaps beyond traditional EVM boundaries.
-
-
-
-## How it's made
-
-🔁 1. Atomic Swap Mechanism Using Bitcoin & Zcash HTLCs
-
-Hollow utilizes Hash Time-Locked Contracts (HTLCs) on Bitcoin and Zcash’s transparent layer to achieve atomicity in cross-chain swaps. It leverages the 1inch cross-chain SDK and existing 1inch smart contracts deployed on both EVM chains and UTXO chains (via script-based logic).
+Hollow is a cross-chain swap app built on 1inch Fusion+, enabling seamless swaps across Bitcoin, Zcash (transparent HTLCs). It also integrates NEAR chain signatures via the Shade Agent Framework to execute 1inch cross-chain orders in a fully chain-abstracted manner.
 
 🔹 When the Maker Asset is BTC:
 

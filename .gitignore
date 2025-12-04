@@ -14,3 +14,5 @@ data_bitcoin_regtest
 .env
 
 .cursor
+
+app/
