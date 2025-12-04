@@ -12,11 +12,7 @@ Hollow is driven by two core visions:
 
 Hollow extends the 1inch Fusion+ protocol to support a broader set of blockchains. For this hackathon, we successfully integrated Bitcoin, Zcash (via transparent HTLCs), Monad, and Etherlink, enabling seamless bidirectional cross-chain swaps between BTC/ZEC and EVM-compatible chains like Monad and Etherlink. This proves that Fusion+ can serve as a universal layer for trustless atomic swaps beyond traditional EVM boundaries.
 
-2. Seamless Multi-Wallet Management in a Chain-Abstracted Context
 
-Hollow tackles the complexity of managing multiple wallets across heterogeneous chains by enabling chain-abstracted cross-chain orders. Using NEAR chain signatures and the Shade Agent Framework, we implemented a secure Trusted Execution Environment (TEE) that acts as a solver for 1inch orders. This TEE can sign both BTC and ETH-based cross-chain orders from a single environment—non-custodially—eliminating the friction of fragmented key management across chains.
-
-Hollow Swap is a cross-chain swap app built on 1inch Fusion+, enabling seamless swaps across Bitcoin, Zcash, Monad, and Etherlink. It also integrates NEAR chain signatures via the Shade Agent Framework to execute 1inch cross-chain orders in a fully chain-abstracted manner.
 
 ## How it's made
 
@@ -85,89 +81,3 @@ Use the following steps to reproduce the `evm -> zec` HTLC flow end-to-end:
    The script mines and funds the Zcash node automatically. You will see logs for each phase (order creation, resolver fill, HTLC funding, withdrawals). The test exits green when the workflow succeeds.
 
 > If you stop the regtest node, rerun step 1 before executing the suite again.
-
-## Partner Integration
-
-### 1inch Fusion + Extension and Building Full Application
-
-I added support for BTC, Monad, and Etherlink. The swap functionality is bidirectional and includes a UI with detailed status displays. I also implemented NEAR’s Shade Agent with chain signatures to sign BTC and ETH cross-chain orders within a TEE environment, demonstrating the potential for chain abstraction.
-
-I primarily used a cross-chain swap SDK and existing smart contracts, making our implementation easily integrable with the 1inch protocol in the future. We closely studied the whitepaper and aimed to align our flow with 1inch Fusion and the existing architecture.
-
-#### The Main implementations are followings.
-
-##### Deploy Script
-
-https://github.com/taijusanagi/2025-unite/blob/main/chains/script/evm/Deploy.s.sol
-
-##### BTC SDK includes HTCL Script
-
-https://github.com/taijusanagi/2025-unite/blob/main/chains/sdk/btc/index.ts#L179
-
-##### Local Swap Test for BTC <> ETH
-
-https://github.com/taijusanagi/2025-unite/blob/main/chains/tests/btc.spec.ts
-
-##### UI - CreateOrder
-
-https://github.com/taijusanagi/2025-unite/blob/main/app/src/app/page.tsx#L169
-
-##### Resolver - Create Escrow
-
-https://github.com/taijusanagi/2025-unite/blob/main/app/src/app/api/resolver/orders/%5Bhash%5D/escrow/route.ts
-
-##### Resoler - Withdraw
-
-https://github.com/taijusanagi/2025-unite/blob/main/app/src/app/api/resolver/orders/%5Bhash%5D/withdraw/route.ts
-
-### NEAR - 1inch Fusion+ Solver Built with NEAR's Shade Agent Framework
-
-I integrated the 1inch Fusion+ Solver, built using NEAR’s Shade Agent Framework, into our application. The app supports cross-chain swaps between BTC and ETH, with unified wallet management enabled by NEAR’s chain signature, which supports both ETH and BTC order signing.
-
-The solver takes trade intents—including makerAsset, takerAsset, and amount—then the agent constructs a 1inch cross-chain order, signed using NEAR’s chain signature.
-
-I believe this architecture lays the foundation for true chain abstraction.
-
-To setup the environment for the demo, please follow this steps.
-
-https://github.com/taijusanagi/2025-unite/tree/main/chain-abstraction-shade-agent
-
-Then you can use http://localhost:8080 in connect Hollow Wallet section.
-
-![Hollow](./app/public/Hollow.png)
-
-### Etherlink
-
-I deployed 1inch protocol's Limit Order Protocol, Escrow Factory, Resolver, and TrueERC20 contracts to enable cross-chain swaps with Etherlink. These contracts and the associated SDK were originally built for mainnet, so I modified the supported chains and hash mechanisms to ensure compatibility with Etherlink.
-
-Additionally, I tested a cross-chain swap between Etherlink and BTC, demonstrating the potential for integrating cross-chain swap functionality within Etherlink.
-
-### Deployments
-
-## Monad
-
-Limit Order Protocol
-https://testnet.monadexplorer.com/address/0x3c63B9da5DA101F36061C9503a06906031D7457c
-
-Escrow Factory
-https://testnet.monadexplorer.com/address/0x73e5d195b5cf7eb46de86901ad941986e74921ca
-
-Resolver
-https://testnet.monadexplorer.com/address/0xF920618C3CF765cE5570A15665C50b3e3f287352
-
-TrueERC20
-https://testnet.monadexplorer.com/address/0xf927004F33f26CaA1763BB21454Ef36AA76e1064
-
-## Etherlink
-
-Limit Order Protocol
-https://testnet.explorer.etherlink.com/address/0x64BE4a6b41A5910b56e26c587454cDc023614e92
-
-Escrow Factory
-https://testnet.explorer.etherlink.com/address/0x7c054c1081F747cbC39Aa4899A53378eA66b3Dea
-
-Resolver
-https://testnet.explorer.etherlink.com/address/0xF920618C3CF765cE5570A15665C50b3e3f287352
-
-TrueERC20
-https://testnet.explorer.etherlink.com/address/0x436b7B4d6cBe36A8cE531b5C5DAa3Eb369035EF4
